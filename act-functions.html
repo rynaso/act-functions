@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ACT Tool - Input</title>
+  <style>
+    body { font-family: Arial; max-width: 700px; margin: auto; padding: 20px; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    textarea, input[type="number"], input[type="email"] {
+      width: 100%; padding: 8px; margin-top: 5px;
+    }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2>ACT Tool - Input Form</h2>
+  <form id="actForm">
+    <label>Email:
+      <input type="email" name="email" required />
+    </label>
+    <div id="domains"></div>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const domains = ["Capability", "Motivation", "Connectivity", "Segmentation", "Prominence", "Norms", "Processes", "Governance", "Resources"];
+    const container = document.getElementById("domains");
+
+    domains.forEach(domain => {
+      container.innerHTML += `
+        <label>${domain} Score (1–5):
+          <input type="number" name="${domain}_score" min="1" max="5" required>
+        </label>
+        <label>${domain} Notes:
+          <textarea name="${domain}_text" rows="3" required></textarea>
+        </label>
+      `;
+    });
+
+    document.getElementById("actForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((val, key) => data[key] = val);
+
+      const response = await fetch('YOUR_GOOGLE_SCRIPT_DEPLOYED_URL_HERE', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Submitted! Redirecting to your results...");
+        window.location.href = `act-results.html?id=${result.id}`;
+      } else {
+        alert("Submission failed.");
+      }
+    });
+  </script>
+</body>
+</html>
