@@ -72,3 +72,27 @@
       formData.forEach((val, key) => data[key] = val);
 
       const response = await fetch('https://script.google.com/macros/s/AKfycbxiO8vXgbQqW6U4GAlE293_9w9uz8OnaGd5kw0-vOKN3HxeWoUAlzmJhIucnZZaak7r/exec', {
+                method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+      const statusDiv = document.getElementById("statusMessage");
+
+      if (result.success) {
+        document.getElementById("actForm").style.display = "none";
+        statusDiv.textContent = "✅ Your submission was successful! Redirecting to results...";
+        statusDiv.style.color = "green";
+        setTimeout(() => {
+          window.location.href = `act-results.html?id=${result.id}`;
+        }, 2000);
+      } else {
+        statusDiv.textContent = "❌ Submission failed. Please try again.";
+        statusDiv.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>
+
