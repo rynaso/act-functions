@@ -44,7 +44,7 @@
       const data = {};
       formData.forEach((val, key) => data[key] = val);
 
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxEtYIM6iEouOrO0X7G6k2SfWhdp2lsz9tNnXiu3dPD1p0TR3hXzEDkdya0AGpVIuKJ/exec', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxCRVJtcLfPIgfroVGfVfN7Eo_71-MzidCGsgRu1gusTYJ5TfNx5MUFtbqbMFQgTBG7/exec', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' }
