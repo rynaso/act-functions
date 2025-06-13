@@ -30,10 +30,10 @@
     domains.forEach(domain => {
       container.innerHTML += `
         <label>${domain} Score (1–5):
-          <input type="number" name="${domain}_score" min="1" max="5" required>
+          <input type="number" name="${domain}" min="1" max="5" required>
         </label>
         <label>${domain} Functions:
-          <textarea name="${domain}_text" rows="3" required></textarea>
+          <textarea name="${domain}_function" rows="3" required></textarea>
         </label>
       `;
     });
