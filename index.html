@@ -5,12 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ACT Tool - Input</title>
   <style>
-    body { font-family: Arial; max-width: 700px; margin: auto; padding: 20px; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    textarea, input[type="number"], input[type="email"] {
-      width: 100%; padding: 8px; margin-top: 5px;
+    body {
+      font-family: Arial;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
     }
-    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    textarea,
+    input[type="number"],
+    input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #statusMessage {
+      margin-top: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -23,8 +44,14 @@
     <button type="submit">Submit</button>
   </form>
 
+  <div id="statusMessage"></div>
+
   <script>
-    const domains = ["Capability", "Motivation", "Connectivity", "Segmentation", "Prominence", "Norms", "Processes", "Governance", "Resources"];
+    const domains = [
+      "Capability", "Motivation", "Connectivity", "Segmentation",
+      "Prominence", "Norms", "Processes", "Governance", "Resources"
+    ];
+
     const container = document.getElementById("domains");
 
     domains.forEach(domain => {
@@ -33,7 +60,7 @@
           <input type="number" name="${domain}" min="1" max="5" required>
         </label>
         <label>${domain} Functions:
-          <textarea name="${domain}_function" rows="3" ></textarea>
+          <textarea name="${domain}_function" rows="3"></textarea>
         </label>
       `;
     });
@@ -45,19 +72,3 @@
       formData.forEach((val, key) => data[key] = val);
 
       const response = await fetch('https://script.google.com/macros/s/AKfycbwUwgDyUmn4GMH9g1IpFFd-hH8ZvbPQ8byQu91XiBEfpiP95Bqx37WkfJQ6TD9ZJzj6/exec', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        alert("Submitted! Redirecting to your results...");
-        window.location.href = `act-results.html?id=${result.id}`;
-      } else {
-        alert("Submission failed.");
-      }
-    });
-  </script>
-</body>
-</html>
