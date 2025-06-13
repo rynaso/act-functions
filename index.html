@@ -71,11 +71,15 @@
       const data = {};
       formData.forEach((val, key) => data[key] = val);
 
-      const response = await fetch('https://script.google.com/macros/s/AKfycbwlmOJKVKIjDXuGGvPbfSdD2qQECC72ruDuw0qKLqZsUTprYI4VlFpKGDskGID7a8A4/exec', {
+const formData = new FormData(e.target);
+const params = new URLSearchParams();
+formData.forEach((val, key) => params.append(key, val));
+
+const response = await fetch('https://script.google.com/macros/s/AKfycbwGs512ru-lRaqCeoO2JJKr01mKQsJTj7XyB4FNBt6E9gObXw8klXRtbSMZzMixLYRb/exec', {
   method: 'POST',
-  body: JSON.stringify(data),
-  headers: { 'Content-Type': 'application/json' }
+  body: params
 });
+
 
       const result = await response.json();
       const statusDiv = document.getElementById("statusMessage");
