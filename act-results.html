@@ -20,32 +20,31 @@
       margin-bottom: 20px;
     }
     #chartContainer {
-      width: 100%;
-      max-width: 600px;
-      height: 600px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 300px;
+      height: 300px;
       position: relative;
       margin: 0 auto;
-      margin-top: 0;
     }
     #chartContainer::before {
       content: "";
       position: absolute;
-      top: -10%;
-      left: -10%;
-      width: 120%;
-      height: 120%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: url("https://i.postimg.cc/153BYDCs/ACT-radar-background-3.png") no-repeat center center;
       background-size: contain;
       z-index: 0;
     }
     canvas#radarChart {
-      position: absolute;
-      top: 22.5%;
-      left: 22.5%;
-      width: 55% !important;
-      height: 55% !important;
+      position: relative;
+      width: 100% !important;
+      height: 100% !important;
       background-color: transparent !important;
-      z-index: 10;
+      z-index: 1;
     }
     #actionButtons {
       display: flex;
@@ -94,7 +93,7 @@
   </table>
   <div id="actionButtons">
     <button onclick="editResponse()">✏️ Edit Your Response</button>
-    <button onclick="downloadDoc()">📄 Download Word</button>
+    <button onclick="downloadImage()">🖼️ Download Image</button>
   </div>
   <script>
     const labels = [
@@ -159,7 +158,7 @@
                   color: '#333',
                   font: { size: 24 }
                 },
-                pointLabels: { display: false },
+                pointLabels: { display: true },
                 grid: { color: '#ccc', circular: true },
                 angleLines: { color: '#ccc' }
               }
@@ -191,46 +190,18 @@
       }
     }
 
-async function downloadDoc() {
-  const originalCanvas = document.getElementById("radarChart");
-  const originalContainer = document.getElementById("chartContainer");
+    async function downloadImage() {
+      const chartContainer = document.getElementById("chartContainer");
+      const canvas = await html2canvas(chartContainer);
+      const imageData = canvas.toDataURL("image/png");
 
-  // Temporarily scale up the chart for export
-  const cloneContainer = originalContainer.cloneNode(true);
-  cloneContainer.style.transform = "scale(1.8)";
-  cloneContainer.style.transformOrigin = "top left";
-  cloneContainer.style.position = "absolute";
-  cloneContainer.style.left = "-9999px"; // hide off-screen
-  document.body.appendChild(cloneContainer);
-
-  // Capture scaled container as image
-  const canvas = await html2canvas(cloneContainer);
-  const imageData = canvas.toDataURL("image/png");
-  document.body.removeChild(cloneContainer);
-
-  // Generate Word content
-  const table = document.querySelector('table');
-  const htmlContent = `
-    <html xmlns:o='urn:schemas-microsoft-com:office:office'
-          xmlns:w='urn:schemas-microsoft-com:office:word'
-          xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'></head>
-      <body>
-        <h2>Your ACT Radar Chart</h2>
-        <img src='${imageData}' style='width: 500px; height: auto;'>
-        ${table.outerHTML}
-      </body>
-    </html>`;
-
-  const blob = new Blob([htmlContent], { type: 'application/msword' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'ACT_Tool_Report.doc';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+      const link = document.createElement('a');
+      link.download = 'ACT_Radar_Chart.png';
+      link.href = imageData;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
     fetchDataAndRenderChart();
   </script>
