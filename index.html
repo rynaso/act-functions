@@ -46,39 +46,43 @@
     <label>Email:
       <input type="email" name="email" required />
     </label>
-    <div id="domains"></div>
+    <div id="domains">
+      <script>
+        const domainDescriptions = {
+          Capability: "Skills, knowledge, and confidence to act effectively.",
+          Motivation: "Willingness and drive to engage and persist.",
+          Connectivity: "Strength and density of relationships across the system.",
+          Segmentation: "Presence of isolated subgroups or silos.",
+          Prominence: "Influence and visibility of champions or key actors.",
+          Norms: "Shared expectations, values, and cultural practices.",
+          Processes: "Standard routines, decision flows, and operations.",
+          Governance: "Structures that guide oversight and leadership.",
+          Resources: "Facilities, tools, and assets that support action."
+        };
+
+        const container = document.currentScript.parentElement;
+
+        Object.entries(domainDescriptions).forEach(([domain, description]) => {
+          const block = document.createElement('div');
+          block.innerHTML = `
+            <label>${domain} Score (1–5):
+              <input type="number" name="${domain}" min="1" max="5" required>
+            </label>
+            <div class="helper-text">${description}</div>
+            <label>${domain} Functions:
+              <textarea name="${domain}_function" rows="3"></textarea>
+            </label>
+          `;
+          container.appendChild(block);
+        });
+      </script>
+    </div>
     <button type="submit">Submit</button>
   </form>
 
   <div id="statusMessage"></div>
 
   <script>
-    const domainDescriptions = {
-      Capability: "Skills, knowledge, and confidence to act effectively.",
-      Motivation: "Willingness and drive to engage and persist.",
-      Connectivity: "Strength and density of relationships across the system.",
-      Segmentation: "Presence of isolated subgroups or silos.",
-      Prominence: "Influence and visibility of champions or key actors.",
-      Norms: "Shared expectations, values, and cultural practices.",
-      Processes: "Standard routines, decision flows, and operations.",
-      Governance: "Structures that guide oversight and leadership.",
-      Resources: "Facilities, tools, and assets that support action."
-    };
-
-    const container = document.getElementById("domains");
-
-    Object.entries(domainDescriptions).forEach(([domain, description]) => {
-      container.innerHTML += `
-        <label>${domain} Score (1–5):
-          <input type="number" name="${domain}" min="1" max="5" required>
-        </label>
-        <div class="helper-text">${description}</div>
-        <label>${domain} Functions:
-          <textarea name="${domain}_function" rows="3"></textarea>
-        </label>
-      `;
-    });
-
     document.getElementById("actForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
