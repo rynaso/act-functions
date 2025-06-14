@@ -184,7 +184,7 @@
         });
 
         document.getElementById("editBtn").addEventListener("click", function () {
-          window.location.href = `https://rynaso.github.io/act-functions/index.html?id=${id}`;
+        window.location.href = `https://rynaso.github.io/act-functions/index.html?id=${id}&email=${encodeURIComponent(entry.email)}`;
         });
 
       } catch (err) {
