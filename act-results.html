@@ -192,19 +192,11 @@
     }
 
     async function downloadDoc() {
-      const chartCanvas = document.getElementById("radarChart");
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = chartCanvas.width;
-      tempCanvas.height = chartCanvas.height;
-      const tempCtx = tempCanvas.getContext("2d");
-
-      tempCtx.fillStyle = "#ffffff";
-      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-      tempCtx.drawImage(chartCanvas, 0, 0);
-
-      const imageData = tempCanvas.toDataURL("image/png");
-      const labelsHTML = labels.map(label => `<li>${label}</li>`).join("");
+      const chartContainer = document.getElementById("chartContainer");
       const table = document.querySelector('table');
+
+      const canvas = await html2canvas(chartContainer);
+      const imageData = canvas.toDataURL("image/png");
 
       const htmlContent = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office'
@@ -213,8 +205,7 @@
           <head><meta charset='utf-8'></head>
           <body>
             <h2>Your ACT Radar Chart</h2>
-            <img src='${imageData}' style='width: 150px; height: auto;'>
-            <ul>${labelsHTML}</ul>
+            <img src='${imageData}' style='width: 300px; height: auto;'>
             ${table.outerHTML}
           </body>
         </html>`;
