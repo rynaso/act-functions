@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ACT Tool Submission</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     body {
@@ -95,7 +94,7 @@
   </table>
   <div id="actionButtons">
     <button onclick="editResponse()">✏️ Edit Your Response</button>
-    <button onclick="downloadPDF()">📄 Download PDF</button>
+    <button onclick="downloadDoc()">📄 Download Word</button>
   </div>
   <script>
     const labels = [
@@ -192,33 +191,33 @@
       }
     }
 
-    async function downloadPDF() {
+    async function downloadDoc() {
       const chartContainer = document.getElementById('chartContainer');
       const table = document.querySelector('table');
 
-      html2canvas(chartContainer, { scale: 2 }).then(canvas => {
-        const imageData = canvas.toDataURL("image/png");
+      const canvas = await html2canvas(chartContainer, { scale: 2 });
+      const imageData = canvas.toDataURL("image/png");
 
-        const pdfContent = document.createElement('div');
-        pdfContent.style.padding = '20px';
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office'
+              xmlns:w='urn:schemas-microsoft-com:office:word'
+              xmlns='http://www.w3.org/TR/REC-html40'>
+          <head><meta charset='utf-8'></head>
+          <body>
+            <h2>Your ACT Radar Chart</h2>
+            <img src='${imageData}' style='width:100%; max-width:600px;'>
+            ${table.outerHTML}
+          </body>
+        </html>`;
 
-        const img = document.createElement('img');
-        img.src = imageData;
-        img.style.width = '100%';
-        pdfContent.appendChild(img);
-
-        const tableClone = table.cloneNode(true);
-        tableClone.style.marginTop = '20px';
-        pdfContent.appendChild(tableClone);
-
-        html2pdf().set({
-          margin: 0.5,
-          filename: 'ACT_Tool_Report.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        }).from(pdfContent).save();
-      });
+      const blob = new Blob([htmlContent], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ACT_Tool_Report.doc';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     fetchDataAndRenderChart();
