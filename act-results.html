@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ACT Tool Submission</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -46,11 +47,13 @@
       background-color: transparent !important;
       z-index: 10;
     }
-    #editBtn {
+    #actionButtons {
       display: flex;
       justify-content: center;
-      align-items: center;
-      margin: 30px auto 0;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    button {
       padding: 10px 20px;
       font-size: 16px;
       background-color: #005bbb;
@@ -58,10 +61,8 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      text-align: center;
-      width: fit-content;
     }
-    #editBtn:hover {
+    button:hover {
       background-color: #004799;
     }
     table {
@@ -91,7 +92,10 @@
     </thead>
     <tbody></tbody>
   </table>
-  <button id="editBtn">✏️ Edit Your Response</button>
+  <div id="actionButtons">
+    <button onclick="editResponse()">✏️ Edit Your Response</button>
+    <button onclick="downloadPDF()">📄 Download PDF</button>
+  </div>
   <script>
     const labels = [
       "Capability", "Motivation", "Connectivity", "Segmentation",
@@ -183,14 +187,27 @@
           tableBody.appendChild(row);
         });
 
-        document.getElementById("editBtn").addEventListener("click", function () {
-          window.location.href = `https://rynaso.github.io/act-functions/index.html?id=${id}`;
-        });
-
       } catch (err) {
         console.error("Error loading radar chart:", err);
         document.body.innerHTML += `<p style="color:red; text-align:center;">⚠️ Unable to load chart data. Please check your link or try again later.</p>`;
       }
+    }
+
+    function editResponse() {
+      const id = new URLSearchParams(window.location.search).get("id");
+      if (id) {
+        window.location.href = `index.html?id=${id}`;
+      }
+    }
+
+    function downloadPDF() {
+      html2pdf().set({
+        margin: 0.5,
+        filename: 'ACT_Tool_Report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      }).from(document.body).save();
     }
 
     fetchDataAndRenderChart();
