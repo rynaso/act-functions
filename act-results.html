@@ -12,6 +12,12 @@
       margin: auto;
       max-width: 600px;
     }
+    #submissionMessage {
+      text-align: center;
+      color: green;
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
     #chartContainer {
       width: 100%;
       max-width: 600px;
@@ -40,13 +46,29 @@
       background-color: transparent !important;
       z-index: 10;
     }
+    #editBtn {
+      display: block;
+      margin: 30px auto 0;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #005bbb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #editBtn:hover {
+      background-color: #004799;
+    }
   </style>
 </head>
 <body>
+  <div id="submissionMessage">✅ Your submission was successful!</div>
   <h2 style="text-align:center; margin-top: 0;">Your ACT Radar Chart</h2>
   <div id="chartContainer">
     <canvas id="radarChart"></canvas>
   </div>
+  <button id="editBtn">✏️ Edit Your Response</button>
   <script>
     const labels = [
       "Capability", "Motivation", "Connectivity", "Segmentation",
@@ -128,6 +150,11 @@
             }
           }
         });
+
+        document.getElementById("editBtn").addEventListener("click", function () {
+          window.open(`https://rynaso.github.io/act-functions/index.html?id=${id}`, "_blank");
+        });
+
       } catch (err) {
         console.error("Error loading radar chart:", err);
         document.body.innerHTML += `<p style="color:red; text-align:center;">⚠️ Unable to load chart data. Please check your link or try again later.</p>`;
