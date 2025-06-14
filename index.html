@@ -130,7 +130,8 @@
         const result = await response.json();
 
         if (result.success) {
-          window.location.href = `act-results.html?id=${result.id}`;
+          const email = document.querySelector("input[name='email']").value;
+          window.location.href = `act-results.html?id=${result.id}&email=${encodeURIComponent(email)}`;
         } else {
           throw new Error(result.error || "Unknown error");
         }
@@ -142,6 +143,12 @@
 
     const editId = getQueryParam("id");
     if (editId) populateForm(editId);
+
+    const editEmail = getQueryParam("email");
+    if (editEmail) {
+      const emailInput = document.querySelector("input[name='email']");
+      if (emailInput) emailInput.value = editEmail;
+    }
   </script>
 </body>
 </html>
