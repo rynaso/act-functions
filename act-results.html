@@ -191,34 +191,47 @@
       }
     }
 
-    async function downloadDoc() {
-      const chartContainer = document.getElementById("chartContainer");
-      const table = document.querySelector('table');
+async function downloadDoc() {
+  const originalCanvas = document.getElementById("radarChart");
+  const originalContainer = document.getElementById("chartContainer");
 
-      const canvas = await html2canvas(chartContainer);
-      const imageData = canvas.toDataURL("image/png");
+  // Temporarily scale up the chart for export
+  const cloneContainer = originalContainer.cloneNode(true);
+  cloneContainer.style.transform = "scale(1.8)";
+  cloneContainer.style.transformOrigin = "top left";
+  cloneContainer.style.position = "absolute";
+  cloneContainer.style.left = "-9999px"; // hide off-screen
+  document.body.appendChild(cloneContainer);
 
-      const htmlContent = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office'
-              xmlns:w='urn:schemas-microsoft-com:office:word'
-              xmlns='http://www.w3.org/TR/REC-html40'>
-          <head><meta charset='utf-8'></head>
-          <body>
-            <h2>Your ACT Radar Chart</h2>
-            <img src='${imageData}' style='width: 300px; height: auto;'>
-            ${table.outerHTML}
-          </body>
-        </html>`;
+  // Capture scaled container as image
+  const canvas = await html2canvas(cloneContainer);
+  const imageData = canvas.toDataURL("image/png");
+  document.body.removeChild(cloneContainer);
 
-      const blob = new Blob([htmlContent], { type: 'application/msword' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'ACT_Tool_Report.doc';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+  // Generate Word content
+  const table = document.querySelector('table');
+  const htmlContent = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office'
+          xmlns:w='urn:schemas-microsoft-com:office:word'
+          xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'></head>
+      <body>
+        <h2>Your ACT Radar Chart</h2>
+        <img src='${imageData}' style='width: 500px; height: auto;'>
+        ${table.outerHTML}
+      </body>
+    </html>`;
+
+  const blob = new Blob([htmlContent], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'ACT_Tool_Report.doc';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
     fetchDataAndRenderChart();
   </script>
 </body>
