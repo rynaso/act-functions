@@ -15,7 +15,7 @@
     #chartContainer {
       width: 100%;
       max-width: 600px;
-      height: 600px;
+      height: 900px;
       position: relative;
       margin: 0 auto;
     }
@@ -32,10 +32,10 @@
     }
     canvas#radarChart {
       position: absolute;
-      top: 25%;
-      left: 25%;
-      width: 50% !important;
-      height: 50% !important;
+      top: 12.5%;
+      left: 12.5%;
+      width: 75% !important;
+      height: 75% !important;
       background-color: transparent !important;
       z-index: 10;
     }
@@ -108,8 +108,7 @@
                   font: { size: 24 }
                 },
                 pointLabels: {
-                  color: (ctx) => labelColors[ctx.chart.data.labels[ctx.index]],
-                  font: { size: 14, weight: 'bold' }
+                  display: false
                 },
                 grid: {
                   color: '#ccc',
