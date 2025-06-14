@@ -130,11 +130,7 @@
         const result = await response.json();
 
         if (result.success) {
-          document.getElementById("actForm").style.display = "none";
-          statusDiv.innerHTML = `✅ Submission successful!<br><br>
-            🔍 <a href="act-results.html?id=${result.id}" target="_blank">View your radar chart</a><br>
-            ✏️ <a href="index.html?id=${result.id}" target="_blank">Edit your responses</a>`;
-          statusDiv.style.color = "green";
+          window.location.href = `act-results.html?id=${result.id}`;
         } else {
           throw new Error(result.error || "Unknown error");
         }
