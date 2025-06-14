@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ACT Tool Results</title>
+  <title>ACT Tool Submission</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -68,7 +68,7 @@
   <div id="chartContainer">
     <canvas id="radarChart"></canvas>
   </div>
-  <button id="editBtn">✏️ Edit Your Response</button>
+  <button id="editBtn"> Edit Your Response</button>
   <script>
     const labels = [
       "Capability", "Motivation", "Connectivity", "Segmentation",
@@ -152,7 +152,7 @@
         });
 
         document.getElementById("editBtn").addEventListener("click", function () {
-          window.open(`https://rynaso.github.io/act-functions/index.html?id=${id}`, "_blank");
+          window.location.href = `https://rynaso.github.io/act-functions/index.html?id=${id}`;
         });
 
       } catch (err) {
