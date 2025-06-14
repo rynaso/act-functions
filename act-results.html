@@ -115,6 +115,7 @@
     };
 
     let radarChart;
+    let originalScores = [];
 
     async function fetchDataAndRenderChart() {
       const params = new URLSearchParams(window.location.search);
@@ -128,7 +129,7 @@
         if (!result.success) throw new Error("Data fetch failed");
 
         const entry = result.entry;
-        const scores = labels.map(label => parseFloat(entry[label]) || 0);
+        originalScores = labels.map(label => parseFloat(entry[label]) || 0);
 
         const ctx = document.getElementById("radarChart").getContext("2d");
         radarChart = new Chart(ctx, {
@@ -137,7 +138,7 @@
             labels: labels,
             datasets: [{
               label: 'Your Scores',
-              data: scores,
+              data: originalScores,
               fill: true,
               backgroundColor: 'rgba(68, 68, 68, 0.3)',
               borderColor: '#444444',
@@ -194,6 +195,8 @@
     document.getElementById("downloadBtn").addEventListener("click", async function (e) {
       e.preventDefault();
 
+      const adjustedScores = originalScores.map(score => Math.max(0, score * 0.9));
+      radarChart.data.datasets[0].data = adjustedScores;
       radarChart.options.scales.r.pointLabels.display = true;
       radarChart.update();
 
@@ -208,6 +211,8 @@
         tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
         tempCtx.drawImage(chartCanvas, 0, 0);
 
+        // Revert to original chart state
+        radarChart.data.datasets[0].data = originalScores;
         radarChart.options.scales.r.pointLabels.display = false;
         radarChart.update();
 
