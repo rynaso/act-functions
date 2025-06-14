@@ -20,31 +20,32 @@
       margin-bottom: 20px;
     }
     #chartContainer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 300px;
-      height: 300px;
+      width: 100%;
+      max-width: 600px;
+      height: 600px;
       position: relative;
       margin: 0 auto;
+      margin-top: 0;
     }
     #chartContainer::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: -10%;
+      left: -10%;
+      width: 120%;
+      height: 120%;
       background: url("https://i.postimg.cc/153BYDCs/ACT-radar-background-3.png") no-repeat center center;
       background-size: contain;
       z-index: 0;
     }
     canvas#radarChart {
-      position: relative;
-      width: 100% !important;
-      height: 100% !important;
+      position: absolute;
+      top: 22.5%;
+      left: 22.5%;
+      width: 55% !important;
+      height: 55% !important;
       background-color: transparent !important;
-      z-index: 1;
+      z-index: 10;
     }
     #actionButtons {
       display: flex;
