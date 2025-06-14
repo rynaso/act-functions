@@ -23,8 +23,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 300px;
-      height: 300px;
+      width: 400px;
+      height: 400px;
       position: relative;
       margin: 0 auto;
     }
@@ -83,7 +83,7 @@
   <div id="submissionMessage">✅ Your submission was successful!</div>
   <h2 style="text-align:center; margin-top: 0;">Your ACT Radar Chart</h2>
   <div id="chartContainer">
-    <canvas id="radarChart" width="300" height="300"></canvas>
+    <canvas id="radarChart" width="400" height="400"></canvas>
   </div>
   <table id="resultsTable">
     <thead>
@@ -204,7 +204,7 @@
           <head><meta charset='utf-8'></head>
           <body>
             <h2>Your ACT Radar Chart</h2>
-            <img src='${imageData}' style='width:100%; max-width:300px;'>
+            <img src='${imageData}' style='width:100%; max-width:400px;'>
             ${table.outerHTML}
           </body>
         </html>`;
