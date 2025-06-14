@@ -94,7 +94,7 @@
   </table>
   <div id="actionButtons">
     <button onclick="editResponse()">✏️ Edit Your Response</button>
-    <button onclick="downloadImage()">🖼️ Download Image</button>
+    <button id="downloadBtn">🖼️ Download Image</button>
   </div>
   <script>
     const labels = [
@@ -191,18 +191,34 @@
       }
     }
 
-    async function downloadImage() {
-      const chartContainer = document.getElementById("chartContainer");
-      const canvas = await html2canvas(chartContainer);
-      const imageData = canvas.toDataURL("image/png");
+    document.getElementById("downloadBtn").addEventListener("click", async function (e) {
+      e.preventDefault();
 
-      const link = document.createElement('a');
-      link.download = 'ACT_Radar_Chart.png';
-      link.href = imageData;
+      // Temporarily show labels
+      radarChart.options.scales.r.pointLabels.display = true;
+      radarChart.update();
+
+      const chartCanvas = document.getElementById("radarChart");
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = chartCanvas.width;
+      tempCanvas.height = chartCanvas.height;
+      const tempCtx = tempCanvas.getContext("2d");
+
+      tempCtx.fillStyle = "#ffffff";
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tempCtx.drawImage(chartCanvas, 0, 0);
+
+      // Restore original (hide labels again)
+      radarChart.options.scales.r.pointLabels.display = false;
+      radarChart.update();
+
+      const link = document.createElement("a");
+      link.download = "radar_chart.png";
+      link.href = tempCanvas.toDataURL("image/png");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }
+    });
 
     fetchDataAndRenderChart();
   </script>
