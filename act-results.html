@@ -195,7 +195,7 @@
     document.getElementById("downloadBtn").addEventListener("click", async function (e) {
       e.preventDefault();
 
-      const adjustedScores = originalScores.map(score => Math.max(0, score * 0.8));
+      const adjustedScores = originalScores.map(score => Math.max(0, score * 0.75));
       radarChart.data.datasets[0].data = adjustedScores;
       radarChart.options.scales.r.pointLabels.display = true;
       radarChart.update();
