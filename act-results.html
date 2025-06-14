@@ -194,30 +194,30 @@
     document.getElementById("downloadBtn").addEventListener("click", async function (e) {
       e.preventDefault();
 
-      // Temporarily show labels
       radarChart.options.scales.r.pointLabels.display = true;
       radarChart.update();
 
-      const chartCanvas = document.getElementById("radarChart");
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = chartCanvas.width;
-      tempCanvas.height = chartCanvas.height;
-      const tempCtx = tempCanvas.getContext("2d");
+      setTimeout(() => {
+        const chartCanvas = document.getElementById("radarChart");
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = chartCanvas.width;
+        tempCanvas.height = chartCanvas.height;
+        const tempCtx = tempCanvas.getContext("2d");
 
-      tempCtx.fillStyle = "#ffffff";
-      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-      tempCtx.drawImage(chartCanvas, 0, 0);
+        tempCtx.fillStyle = "#ffffff";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.drawImage(chartCanvas, 0, 0);
 
-      // Restore original (hide labels again)
-      radarChart.options.scales.r.pointLabels.display = false;
-      radarChart.update();
+        radarChart.options.scales.r.pointLabels.display = false;
+        radarChart.update();
 
-      const link = document.createElement("a");
-      link.download = "radar_chart.png";
-      link.href = tempCanvas.toDataURL("image/png");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        const link = document.createElement("a");
+        link.download = "radar_chart.png";
+        link.href = tempCanvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, 100);
     });
 
     fetchDataAndRenderChart();
