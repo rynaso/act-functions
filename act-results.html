@@ -6,6 +6,7 @@
   <title>ACT Tool Submission</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -114,6 +115,8 @@
       "Resources": "#93AB94"
     };
 
+    let radarChart;
+
     async function fetchDataAndRenderChart() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
@@ -129,7 +132,7 @@
         const scores = labels.map(label => parseFloat(entry[label]) || 0);
 
         const ctx = document.getElementById("radarChart").getContext("2d");
-        new Chart(ctx, {
+        radarChart = new Chart(ctx, {
           type: 'radar',
           data: {
             labels: labels,
@@ -157,24 +160,13 @@
                   color: '#333',
                   font: { size: 24 }
                 },
-                pointLabels: {
-                  display: false
-                },
-                grid: {
-                  color: '#ccc',
-                  circular: true
-                },
+                pointLabels: { display: false },
+                grid: { color: '#ccc', circular: true },
                 angleLines: { color: '#ccc' }
               }
             },
-            plugins: {
-              legend: { display: false },
-              tooltip: { position: 'nearest' }
-            },
-            elements: {
-              line: { borderWidth: 3, tension: 0 },
-              point: { radius: 5 }
-            }
+            plugins: { legend: { display: false }, tooltip: { position: 'nearest' } },
+            elements: { line: { borderWidth: 3, tension: 0 }, point: { radius: 5 } }
           }
         });
 
@@ -200,14 +192,29 @@
       }
     }
 
-    function downloadPDF() {
+    async function downloadPDF() {
+      const chartCanvas = document.getElementById('radarChart');
+      const imageData = chartCanvas.toDataURL("image/png", 1.0);
+
+      const pdfContent = document.createElement('div');
+      pdfContent.style.padding = '20px';
+
+      const img = document.createElement('img');
+      img.src = imageData;
+      img.style.width = '100%';
+      pdfContent.appendChild(img);
+
+      const tableClone = document.querySelector('table').cloneNode(true);
+      tableClone.style.marginTop = '20px';
+      pdfContent.appendChild(tableClone);
+
       html2pdf().set({
         margin: 0.5,
         filename: 'ACT_Tool_Report.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      }).from(document.body).save();
+      }).from(pdfContent).save();
     }
 
     fetchDataAndRenderChart();
