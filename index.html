@@ -32,6 +32,12 @@
       margin-top: 20px;
       font-weight: bold;
     }
+    .helper-text {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -47,18 +53,26 @@
   <div id="statusMessage"></div>
 
   <script>
-    const domains = [
-      "Capability", "Motivation", "Connectivity", "Segmentation",
-      "Prominence", "Norms", "Processes", "Governance", "Resources"
-    ];
+    const domainDescriptions = {
+      Capability: "Skills, knowledge, and confidence to act effectively.",
+      Motivation: "Willingness and drive to engage and persist.",
+      Connectivity: "Strength and density of relationships across the system.",
+      Segmentation: "Presence of isolated subgroups or silos.",
+      Prominence: "Influence and visibility of champions or key actors.",
+      Norms: "Shared expectations, values, and cultural practices.",
+      Processes: "Standard routines, decision flows, and operations.",
+      Governance: "Structures that guide oversight and leadership.",
+      Resources: "Facilities, tools, and assets that support action."
+    };
 
     const container = document.getElementById("domains");
 
-    domains.forEach(domain => {
+    Object.entries(domainDescriptions).forEach(([domain, description]) => {
       container.innerHTML += `
         <label>${domain} Score (1–5):
           <input type="number" name="${domain}" min="1" max="5" required>
         </label>
+        <div class="helper-text">${description}</div>
         <label>${domain} Functions:
           <textarea name="${domain}_function" rows="3"></textarea>
         </label>
@@ -68,35 +82,35 @@
     document.getElementById("actForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const data = {};
-      formData.forEach((val, key) => data[key] = val);
+      const params = new URLSearchParams();
+      formData.forEach((val, key) => params.append(key, val));
 
-const formData = new FormData(e.target);
-const params = new URLSearchParams();
-formData.forEach((val, key) => params.append(key, val));
-
-const response = await fetch('https://script.google.com/macros/s/AKfycbwGs512ru-lRaqCeoO2JJKr01mKQsJTj7XyB4FNBt6E9gObXw8klXRtbSMZzMixLYRb/exec', {
-  method: 'POST',
-  body: params
-});
-
-
-      const result = await response.json();
       const statusDiv = document.getElementById("statusMessage");
+      statusDiv.style.color = "black";
+      statusDiv.textContent = "⏳ Submitting your responses...";
 
-      if (result.success) {
-        document.getElementById("actForm").style.display = "none";
-        statusDiv.textContent = "✅ Your submission was successful! Redirecting to results...";
-        statusDiv.style.color = "green";
-        setTimeout(() => {
-          window.location.href = `act-results.html?id=${result.id}`;
-        }, 2000);
-      } else {
-        statusDiv.textContent = "❌ Submission failed. Please try again.";
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbwGs512ru-lRaqCeoO2JJKr01mKQsJTj7XyB4FNBt6E9gObXw8klXRtbSMZzMixLYRb/exec', {
+          method: 'POST',
+          body: params
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          document.getElementById("actForm").style.display = "none";
+          statusDiv.innerHTML = `✅ Submission successful!<br><br>
+            🔍 <a href="act-results.html?id=${result.id}" target="_blank">View your radar chart</a><br>
+            ✏️ <a href="index.html?id=${result.id}" target="_blank">Edit your responses</a>`;
+          statusDiv.style.color = "green";
+        } else {
+          throw new Error(result.error || "Unknown error");
+        }
+      } catch (err) {
+        statusDiv.textContent = `❌ Submission failed: ${err.message}`;
         statusDiv.style.color = "red";
       }
     });
   </script>
 </body>
 </html>
-
