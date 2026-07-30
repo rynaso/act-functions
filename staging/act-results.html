@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACT Tool Staging Results</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px;
+      color: #202124;
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      text-align: center;
+      font-size: 1.75rem;
+    }
+
+    #statusMessage {
+      min-height: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .success {
+      color: #137333;
+    }
+
+    .error {
+      color: #b3261e;
+    }
+
+    #chartContainer {
+      position: relative;
+      width: 100%;
+      max-width: 620px;
+      aspect-ratio: 1;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    #chartContainer::before {
+      position: absolute;
+      z-index: 0;
+      inset: -10%;
+      background: url("https://i.postimg.cc/153BYDCs/ACT-radar-background-3.png") no-repeat center;
+      background-size: contain;
+      content: "";
+    }
+
+    #radarChart {
+      position: absolute;
+      z-index: 1;
+      top: 22.5%;
+      left: 22.5%;
+      width: 55% !important;
+      height: 55% !important;
+    }
+
+    .table-scroll {
+      margin-top: 32px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 9px;
+      border: 1px solid #c7cdd3;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f1f3f4;
+    }
+
+    #actionButtons {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 4px;
+      background: #005bbb;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    button:hover {
+      background: #004799;
+    }
+
+    button:focus {
+      outline: 3px solid rgba(0, 91, 187, 0.25);
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 16px;
+      }
+
+      th,
+      td {
+        padding: 7px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p><strong>Test environment:</strong> these results use the protected version 13 backend.</p>
+    <div id="statusMessage" role="status" aria-live="polite">Loading your ACT results...</div>
+    <h1>Your ACT Radar Chart</h1>
+
+    <div id="chartContainer">
+      <canvas id="radarChart" width="400" height="400" aria-label="ACT domain radar chart"></canvas>
+    </div>
+
+    <div class="table-scroll">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th scope="col">Domain</th>
+            <th scope="col">Function</th>
+            <th scope="col">Score</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="actionButtons">
+      <button id="editButton" type="button">Edit response</button>
+      <button id="downloadButton" type="button">Download image</button>
+    </div>
+  </main>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby0FVdZivjPB9a4tN3d_yI6jMzbeWPV6TZZczX-d0vgVONUA8Hs9u0-tP9RCxUSRDvt/exec";
+    const labels = [
+      "Capability",
+      "Motivation",
+      "Connectivity",
+      "Segmentation",
+      "Prominence",
+      "Norms",
+      "Processes",
+      "Governance",
+      "Resources"
+    ];
+    const labelColors = {
+      Capability: "#F4B5A1",
+      Motivation: "#F4B5A1",
+      Connectivity: "#90A4B5",
+      Segmentation: "#90A4B5",
+      Prominence: "#90A4B5",
+      Norms: "#93AB94",
+      Processes: "#93AB94",
+      Governance: "#93AB94",
+      Resources: "#93AB94"
+    };
+
+    const responseId = new URLSearchParams(window.location.search).get("id");
+    const statusMessage = document.getElementById("statusMessage");
+    const actionButtons = document.getElementById("actionButtons");
+    const downloadButton = document.getElementById("downloadButton");
+    let radarChart;
+
+    function setStatus(message, className) {
+      statusMessage.textContent = message;
+      statusMessage.className = className || "";
+    }
+
+    function renderTable(entry) {
+      const tableBody = document.querySelector("#resultsTable tbody");
+      tableBody.replaceChildren();
+
+      labels.forEach((label) => {
+        const row = document.createElement("tr");
+        const labelCell = document.createElement("td");
+        const functionCell = document.createElement("td");
+        const scoreCell = document.createElement("td");
+
+        labelCell.textContent = label;
+        functionCell.textContent = String(entry[label + "_function"] || "");
+        scoreCell.textContent = String(entry[label] || "");
+        row.append(labelCell, functionCell, scoreCell);
+        tableBody.appendChild(row);
+      });
+    }
+
+    function renderChart(entry) {
+      const scores = labels.map((label) => Number(entry[label]));
+      const context = document.getElementById("radarChart").getContext("2d");
+
+      radarChart = new Chart(context, {
+        type: "radar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Your scores",
+            data: scores,
+            fill: true,
+            backgroundColor: "rgba(68, 68, 68, 0.3)",
+            borderColor: "#444",
+            pointBackgroundColor: labels.map((label) => labelColors[label]),
+            pointBorderColor: "#444",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: labels.map((label) => labelColors[label])
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 5,
+              ticks: {
+                stepSize: 1,
+                color: "#333",
+                font: { size: 16 }
+              },
+              pointLabels: { display: false },
+              grid: { color: "#ccc", circular: true },
+              angleLines: { color: "#ccc" }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { position: "nearest" }
+          },
+          elements: {
+            line: { borderWidth: 3 },
+            point: { radius: 5 }
+          }
+        }
+      });
+    }
+
+    async function loadResults() {
+      if (!responseId) {
+        setStatus("This results link is missing a response ID.", "error");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          WEB_APP_URL + "?id=" + encodeURIComponent(responseId)
+        );
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Unable to load the results.");
+        }
+
+        renderChart(result.entry);
+        renderTable(result.entry);
+        actionButtons.style.display = "flex";
+        const emailFailed =
+          new URLSearchParams(window.location.search).get("email") === "failed";
+        setStatus(
+          emailFailed
+            ? "Your response was saved, but the confirmation email could not be sent."
+            : "Your submission was successful.",
+          emailFailed ? "error" : "success"
+        );
+      } catch (error) {
+        setStatus(error.message || "Unable to load the results.", "error");
+      }
+    }
+
+    document.getElementById("editButton").addEventListener("click", () => {
+      window.location.assign("index.html?id=" + encodeURIComponent(responseId));
+    });
+
+    downloadButton.addEventListener("click", async () => {
+      downloadButton.disabled = true;
+      setStatus("Preparing your image...", "");
+
+      try {
+        const canvas = await html2canvas(document.getElementById("chartContainer"), {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          useCORS: true
+        });
+        const link = document.createElement("a");
+        link.download = "act-radar-chart.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        setStatus("Your chart image was downloaded.", "success");
+      } catch (error) {
+        setStatus("The chart image could not be created. Please try again.", "error");
+      } finally {
+        downloadButton.disabled = false;
+      }
+    });
+
+    loadResults();
+  </script>
+</body>
+</html>
